@@ -1,0 +1,26 @@
+rem 1、合并图片
+rem 2、生成box文件
+tesseract.exe num.font.exp0.tif num.font.exp0 -l num --psm 7 makebox
+rem 3、修改box文件
+rem 4、生成font_properties
+echo fontyp 0 0 0 0 0 >font_properties
+rem 5、生成训练文件
+tesseract.exe num.font.exp0.tif num.font.exp0 -l num --psm 7 box.train
+rem 6、生成字符集文件
+unicharset_extractor.exe num.font.exp0.box 
+rem 7、生成shape文件
+shapeclustering -F font_properties.txt -U unicharset num.font.exp0.tr 
+rem 8、生成聚集字符特征文件
+mftraining -F font_properties.txt -U unicharset -O num.unicharset num.font.exp0.tr 
+rem 9、生成字符正常化特征文件
+cntraining.exe num.font.exp0.tr 
+rem 10、更名
+rename normproto num.normproto 
+
+rename inttemp num.inttemp 
+
+rename pffmtable num.pffmtable 
+
+rename shapetable num.shapetable  
+rem 11、合并训练文件，生成fontyp.traineddata
+combine_tessdata.exe num.
